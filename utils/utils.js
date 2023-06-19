@@ -51,7 +51,7 @@ async function makeTransaction(
   productSupplied
 ) {
   console.log("inside make transaction");
-  console.log( senderAccountNo,
+  console.log(senderAccountNo,
     receiverAccountNo,
     balance,
     senderAddress,
@@ -60,12 +60,10 @@ async function makeTransaction(
     validated,
     productSupplied);
   if (senderAccountNo === receiverAccountNo) {
-    throw new Error("Can't possible to make a transaction in the same account.");
+    throw new Error("Can't make a transaction in the same account.");
   }
-  console.log("here2");
   const senderAccount = await BankAccount.findOne({ account_number: senderAccountNo })
   const receiverAccount = await BankAccount.findOne({ account_number: receiverAccountNo })
-  console.log("here3");
   if (!senderAccount || !receiverAccount) {
     const message = !senderAccount
       ? "Sender account " + senderAccountNo + " not found"

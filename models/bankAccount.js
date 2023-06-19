@@ -11,7 +11,8 @@ const BankAccountSchema = new Schema({
   },
   balance: {
     type: Number,
-    required: [true, 'Balance is required!'],
+    // required: [true, 'Balance is required!'],
+    default: 100,
   },
   key: {
     type: String,

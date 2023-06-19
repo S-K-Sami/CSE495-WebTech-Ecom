@@ -10,6 +10,7 @@ export const POST = async (request) => {
     const newBankAccount = new BankAccount({
       user_id: userId,
       account_number: accountNumber,
+      // balance: balance? balance: Infinity,
       balance,
       key,
     });
@@ -28,7 +29,7 @@ export const GET = async (request) => {
     await connectToDB();
    
     const bankAccount = await BankAccount.findOne({ user_id: userId });
-    console.log("fff");
+    console.log("/api/bank-account");
     if (!bankAccount) {
       return new Response("Bank account not found", { status: 404 });
     }

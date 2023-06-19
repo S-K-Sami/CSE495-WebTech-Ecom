@@ -24,7 +24,7 @@ export const GET = async (request) => {
     await connectToDB();
 
     const account = await Account.findOne({ user_id: userId });
-    console.log(account + "dsds");
+    console.log(account + "; /api/account");
     if (!account) {
       return new Response("Account not found", { status: 404 });
     }

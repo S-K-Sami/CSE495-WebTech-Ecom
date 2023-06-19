@@ -10,47 +10,49 @@ const UserInfoForm = () => {
   const formRef = useRef(null);
   const { data: session } = useSession();
 
-  const handleSubmit =async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-  // Create a user object with form data
-  const user = {
-    accountNumber,
-    key,
-    address,
-    userId: session.user.id // Assuming the user ID is available in the session
-  };
+    // Create a user object with form data
+    const user = {
+      accountNumber,
+      key,
+      address,
+      userId: session.user.id // Assuming the user ID is available in the session
+    };
 
-  try {
-    // Make the POST request to the account collection
-    const response = await fetch('/api/account', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user)
-    });
+    try {
+      // Make the POST request to the account collection
+      const response = await fetch('/api/account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      });
 
-    if (response.ok) {
-      // User information successfully saved
-      setFormVisible(false);
-      setUserExists(true);
-      // Reset form fields
-      setAccountNumber('');
-      setKey('');
-      setAddress('');
-    } else {
-      // Handle the error case
+      if (response.ok) {
+        // User information successfully saved
+        setFormVisible(false);
+        setUserExists(true);
+        // Reset form fields
+        setAccountNumber('');
+        setKey('');
+        setAddress('');
+      } else {
+        // Handle the error case
+        // Display an error message or perform any desired action
+      }
+    } catch (error) {
+      // Handle any network or server errors
       // Display an error message or perform any desired action
     }
-  } catch (error) {
-    // Handle any network or server errors
-    // Display an error message or perform any desired action
-  }
   };
 
   const toggleFormVisibility = () => {
     setFormVisible(!formVisible);
+    // console.log({formVisible});
+    // console.log({session});
   };
 
   useEffect(() => {
@@ -65,9 +67,12 @@ const UserInfoForm = () => {
         // Replace the API_URL with the appropriate URL to fetch the account data
         const response = await fetch(`/api/account?userId=${session.user.id}`);
         const data = await response.json();
-        console.log("dataaaa" + data);
+        // console.log("User Account: " + data);
         // If the user exists in the account collection, set userExists to true
         setUserExists(data !== null);
+        setAccountNumber(data?.account_number);
+        setKey(data?.key);
+        setAddress(data?.address);
       } catch (error) {
         console.error('Error fetching account data:', error);
       }
@@ -81,6 +86,12 @@ const UserInfoForm = () => {
   return (
     <div className="flex flex-col items-center mt-8">
       <h1 className="text-2xl font-bold mb-4">User Information</h1>
+      <div>
+        {userExists ? (
+          <div className="text-gray-500">User already provided information</div>
+        ) :
+          <div className="text-gray-500">Please fill up the form</div>}
+      </div>
       <div className="cursor-pointer mb-4" onClick={toggleFormVisibility}>
         {formVisible ? (
           <span className="text-black-500">Hide User Information Form</span>
@@ -88,62 +99,64 @@ const UserInfoForm = () => {
           <span className="text-black-500">Show User Information Form</span>
         )}
       </div>
-
-      {userExists ? (
-        <div className="text-gray-500">User already provided information</div>
-      ) : formVisible ? (
-        <form className="w-3/4" onSubmit={handleSubmit} ref={formRef}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="accountNumber">
-              Account Number
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full xl:w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="accountNumber"
-              type="text"
-              value={accountNumber}
-              onChange={(e) => setAccountNumber(e.target.value)}
-              placeholder="Enter Account Number"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="key">
-              Key
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full xl:w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="key"
-              type="text"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              placeholder="Enter Key"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="address">
-              Address
-            </label>
-            <textarea
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter Address"
-              required
-            />
-          </div>
-          <div className="flex justify-center">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="submit"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      ) : null}
+      <div>
+        {formVisible ? (
+          <form className="w-3/4" onSubmit={handleSubmit} ref={formRef}>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="accountNumber">
+                Account Number
+              </label>
+              <input
+                readOnly={userExists}
+                className="shadow appearance-none border rounded w-full xl:w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="accountNumber"
+                type="text"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                placeholder="Enter Account Number"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="key">
+                Key
+              </label>
+              <input
+                readOnly={userExists}
+                className="shadow appearance-none border rounded w-full xl:w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="key"
+                type="text"
+                value={key}
+                onChange={(e) => setKey(e.target.value)}
+                placeholder="Enter Key"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="address">
+                Address
+              </label>
+              <textarea
+                readOnly={userExists}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter Address"
+                required
+              />
+            </div>
+            <div className="flex justify-center">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit"
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+        ) : null}
+      </div>
     </div>
   );
 };
